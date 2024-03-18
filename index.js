@@ -51,7 +51,7 @@ app.get('/canvas',async(req,res)=>{
   let browser
   if(!localEnv){
     browser = await puppeteerExtra.launch({ 
-      headless: false,//responsible for opening tab// making false for the browser to show up
+      headless: true,//responsible for opening tab// making false for the browser to show up
       ignoreDefaultArgs: ['--disable-extensions'] ,
       args:[   '--disable-gpu',
       '--disable-dev-shm-usage',
