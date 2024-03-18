@@ -27,8 +27,13 @@ app.use(limiter)
 app.use(cors());
 
 
+////:TODO uncomment this to create the task/ you can also update the time you want the task run
+// var task = cron.schedule('0 23 * * 1-5', () => {
+//   // This function will be executed every minute
+//   fetch("https://canvas-meeting-publishing-production.up.railway.app/canvas")
+// }, {timezone: 'America/New_York' // Set timezone to Eastern Time Zone});
 
-
+// task.start();
 
 app.get('/',async(req,res)=>{
   console.log('hello')
@@ -73,7 +78,7 @@ app.get('/canvas',async(req,res)=>{
 
   await page.goto(canvasLink,{ timeout: 0,slowMo: 500 });
 
-  let url = await page.url(); 
+     let url = await page.url(); 
     console.log("🚀 ~ file: index.js:154 ~ app.get ~ url:", url)
 
 
