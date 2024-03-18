@@ -1,0 +1,8 @@
+node_modules
+# cookies.json
+cookies2.json
+log.log
+.env
+access.log
+jp.js
+canvas.json
