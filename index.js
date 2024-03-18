@@ -1,17 +1,13 @@
 require('dotenv').config()
 const puppeteer = require('puppeteer')
-const stealthPlugin  = require('puppeteer-extra-plugin-stealth')
 const express = require('express')
-const puppeteerExtra  = require('puppeteer-extra')
 const app = express()
 const localEnv = process.env.PORT?true: false
 const PORT = process.env.PORT || 5454 ;
 const helmet = require("helmet");// Load the connectDB function
 const rateLimit = require('express-rate-limit')
 const fs = require('fs');
-const path = require('path');
 const cors = require('cors');
-const url = require('url');
 var cron = require('node-cron');
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
@@ -46,55 +42,19 @@ app.get('/canvas',async(req,res)=>{
   try{
    
 
-  canvasLink = 'https://perscholas.instructure.com/courses/1966/external_tools/5543'
-  puppeteerExtra.use(stealthPlugin());
+  canvasLink = process.env.canvas_zoom_link
   let browser
   if(!localEnv){
-    browser = await puppeteerExtra.launch({ 
-      headless: true,//responsible for opening tab// making false for the browser to show up
+    browser = await puppeteer.launch({ 
+      headless: false,//responsible for opening tab// making false for the browser to show up
       ignoreDefaultArgs: ['--disable-extensions'] ,
-      args:[   '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-setuid-sandbox',
-      '--no-first-run',
-      '--no-sandbox',
-      '--no-zygote',
-      '--deterministic-fetch',
-      '--disable-features=IsolateOrigins',
-      '--disable-site-isolation-trials',
-      "--disable-gpu",
-      "--disable-accelerated-2d-canvas",
-      '--use-fake-ui-for-media-stream',
-      // `--window-size=900,671`,
-      '--disable-features=IsolateOrigins,site-per-process',
-      '--disable-web-security',
-      // '--single-process',
-    ]
-      // ,product: 'firefox' 
+      args:['--no-sandbox', '--disable-setuid-sandbox']
     });
   }else{
-    browser = await puppeteerExtra.launch({ 
+    browser = await puppeteer.launch({ 
       headless: 'true',//responsible for opening tab
-      executablePath: '/usr/bin/chromium-browser',
       ignoreDefaultArgs: ['--disable-extensions'] ,
-      args:[   '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-setuid-sandbox',
-      '--no-first-run',
-      '--no-sandbox',
-      '--no-zygote',
-      '--deterministic-fetch',
-      '--disable-features=IsolateOrigins',
-      '--disable-site-isolation-trials',
-      "--disable-gpu",
-      "--disable-accelerated-2d-canvas",
-      '--use-fake-ui-for-media-stream',
-      `--window-size=900,671`,
-      '--disable-features=IsolateOrigins,site-per-process',
-      '--disable-web-security',
-      // '--single-process',
-    ]
-      // ,product: 'firefox' 
+      args:['--no-sandbox', '--disable-setuid-sandbox']
     });
   }
 
@@ -102,10 +62,7 @@ app.get('/canvas',async(req,res)=>{
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0); // Set the timeout to 0 to disable it
   let cookies = [];
-  page.on('dialog', async (dialog) => {
-    // Accept or dismiss the dialog based on your requirement
-    await dialog.accept(); // or dialog.dismiss() to dismiss the dialog
-  });
+
 
   if (fs.existsSync('canvas.json')) {
   cookies = JSON.parse(fs.readFileSync('canvas.json', 'utf-8'));
@@ -132,7 +89,7 @@ app.get('/canvas',async(req,res)=>{
 
     
   }
-await new Promise(resolve => setTimeout(resolve, 5000));
+await new Promise(resolve => setTimeout(resolve, 1000));
 if(url === "https://perscholas.instructure.com/login/canvas"){
   cookies = await page.cookies();
   fs.writeFileSync('canvas.json', JSON.stringify(cookies));
@@ -145,6 +102,7 @@ const openRecordings = await frame.waitForSelector('div[role="tab"]:nth-of-type(
 await openRecordings.evaluate(b => b.click()); 
 console.log('cloud meeting click')
     await frame.waitForSelector('td button');
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     await frame.evaluate(() => {
       let meetings = Array.from(document.querySelectorAll('td button'))
@@ -157,6 +115,7 @@ console.log('cloud meeting click')
       }
 
     });
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     console.log('done')
     res.status(200).json({status:'success'})
@@ -187,8 +146,7 @@ res.status(400).json({err:err.message})
 app.listen(PORT, () => { 
     console.log('Listening to the port:  ' + PORT, localEnv?'local':'production')
 
-      // mongoConfig()
-   
+  
 })
 
 
