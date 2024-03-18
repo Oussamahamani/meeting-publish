@@ -30,7 +30,7 @@ app.use(cors());
 ////:TODO uncomment this to create the task/ you can also update the time you want the task run
 // var task = cron.schedule('0 23 * * 1-5', () => {
 //   // This function will be executed every minute
-//   fetch("https://canvas-meeting-publishing-production.up.railway.app/canvas")
+//   fetch(proccess.env.appLink)
 // }, {timezone: 'America/New_York' // Set timezone to Eastern Time Zone});
 
 // task.start();
